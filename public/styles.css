@@ -1,56 +1,116 @@
+/* ======================================================
+   styles.css — "La pintura y decoración"
+   Aquí no hay lógica de programa, solo reglas de apariencia:
+   colores, tamaños, posiciones y una animación.
+   ====================================================== */
+
 body {
   margin: 0;
+  /* Quitamos el margen por defecto que los navegadores le ponen al body,
+     para que nuestro diseño empiece pegado al borde de la pantalla */
+
   background-color: #000;
+  /* Fondo negro detrás de todo */
+
   color: #fff;
+  /* Color de texto blanco por defecto */
+
+  display: flex;
+  /* Convertimos el body en un contenedor flex para poder centrar
+     fácilmente a su hijo (<main>) horizontalmente */
+
+  justify-content: center;
+  /* Centra a <main> en el eje horizontal.
+     Nota: solo centramos horizontalmente, no verticalmente,
+     tal como se pidió (si en el futuro se quiere centrar también
+     verticalmente, se puede agregar align-items: center y darle
+     una altura al body, por ejemplo min-height: 100vh) */
 }
 
 main {
   position: relative;
+  /* "relative" convierte a <main> en el "punto de referencia" para
+     cualquier elemento hijo que use position: absolute (como #pokeball,
+     #text-overlay, #play). Sin esto, esos elementos se posicionarían
+     respecto a toda la página en vez de respecto a esta caja */
+
   width: 575px;
+  /* Ancho fijo del tablero de juego */
+
   background-image: url('https://res.cloudinary.com/dzynqn10l/image/upload/v1633196203/Msc/pokemon-bg_ig4uv3.jpg');
+  /* Imagen de fondo tipo "escenario de batalla Pokémon" */
+
   background-size: 110%;
+  /* Agranda un poco la imagen de fondo (110% de su tamaño normal) */
+
   background-repeat: no-repeat;
+  /* Evita que la imagen se repita en mosaico */
 }
 
 #pokemon-container {
   height: 355px;
+  /* Alto fijo para el área donde viven la Pokéball y la imagen del Pokémon */
 }
 
 #answer {
   display: none;
+  /* Oculto por defecto. Solo aparece cuando <main> tiene la clase "revealed"
+     (mirar la regla "main.revealed #answer" más abajo) */
 }
 
 #bg-overlay {
   color: #fff;
   position: absolute;
+  /* Se posiciona respecto a <main> (que es "relative") */
+
   background-color: #dd1716;
+  /* Rojo, simulando el círculo de fondo del típico letrero "¡Es...!" de Pokémon */
+
   right: 25px;
   width: 170px;
   height: 170px;
   top: 60px;
+
   border-radius: 50%;
+  /* 50% convierte el cuadrado en un círculo perfecto */
 }
 
 #text-overlay {
   position: absolute;
   right: 20px;
   top: 100px;
+  /* Se coloca encima del círculo rojo (#bg-overlay), un poco desplazado */
+
   background-color: #ffcb02;
+  /* Amarillo, como el recuadro de texto de un cómic */
+
   border: solid 7px #2c70ae;
+  /* Borde azul grueso */
+
   padding: 20px;
   min-width: 130px;
+
   font-family: 'Bangers', Arial, sans-serif;
+  /* Usamos la fuente "Bangers" que importamos en el HTML.
+     Si por algún motivo no carga, usamos Arial como respaldo */
+
   font-size: 36px;
   letter-spacing: 1.2px;
   color: #3ea2fe;
+
   text-shadow: 2px 2px #1d366c;
+  /* Sombra al texto para darle un efecto de "letrero de cómic" */
+
   border-radius: 20px;
   text-align: center;
 }
 
 #controls {
   position: relative;
+  /* Sirve como referencia para el botón #play, que usa position: absolute */
+
   padding: 20px 40px;
+  /* Espacio interno: 20px arriba/abajo, 40px izquierda/derecha */
 }
 
 button {
@@ -62,84 +122,204 @@ button {
   padding: 10px 36px;
   border-radius: 8px;
   text-transform: uppercase;
+  /* Convierte visualmente el texto del botón a mayúsculas, aunque en el HTML esté en minúsculas */
+
   box-shadow: 0px 4px 10px 1px;
+  /* Sombra sutil debajo del botón, para dar sensación de "elevado" */
+
   cursor: pointer;
+  /* Cambia el cursor a "manito" al pasar por encima, indicando que es clickeable */
+
   transition: all .2s ease-out;
+  /* Anima suavemente cualquier cambio (como el hover) en 0.2 segundos,
+     en vez de que el cambio sea instantáneo y brusco */
 }
 
 button:hover {
+  /* Estilos que se aplican solo cuando el mouse está encima del botón */
   box-shadow: 0px 4px 10px 4px;
   background-color: #fff6d1;
 }
 
 button.correct,
 button.incorrect {
+  /* Estilos compartidos por ambas clases: quitamos la sombra y
+     ponemos un color de texto claro que se lea bien sobre verde o rojo */
   color: #d9fcd9;
   box-shadow: none;
 }
 
 button.correct {
   background: #0dff0d;
+  /* Verde: se agrega vía JS cuando el usuario acierta */
 }
 
 button.incorrect {
   background: #ea2e25;
+  /* Rojo: se agrega vía JS cuando el usuario falla */
 }
 
 #play {
   position: absolute;
+  /* Se posiciona respecto a #controls (su padre con position: relative) */
+
   top: -56px;
+  /* Valor negativo: lo saca hacia ARRIBA del borde de #controls,
+     para que quede flotando encima del tablero */
+
   left: 39px;
+}
+
+button:disabled {
+  /* MEJORA: estilo compartido para CUALQUIER botón deshabilitado
+     (tanto #play mientras carga, como los botones de #choices
+     después de que el usuario ya respondió) */
+
+  opacity: 0.5;
+  /* Los vuelve semi-transparentes, para que se vea a simple vista
+     que ya no se puede interactuar con ellos */
+
+  cursor: not-allowed;
+  /* Cambia el cursor para reforzar visualmente que la acción no está permitida */
+}
+
+button:disabled:hover {
+  /* Anulamos el efecto hover normal (sombra más grande, fondo amarillo)
+     para que un botón deshabilitado no "responda" al pasar el mouse */
+  box-shadow: 0px 4px 10px 1px;
+  background-color: #fff;
+}
+
+#error-message {
+  display: none;
+  /* MEJORA: oculto por defecto. Solo se muestra cuando falla la petición
+     a la PokéAPI (ver la clase "visible" más abajo) */
+
+  color: #ff6b6b;
+  /* Rojo claro, para que se lea bien sobre el fondo oscuro */
+
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin: 12px 0 0;
+}
+
+#error-message.visible {
+  display: block;
+  /* index.js agrega esta clase cuando ocurre un error de red,
+     lo que hace que el mensaje pase de "display: none" a "display: block" */
 }
 
 #pokeball {
   width: 78px;
+
   margin: 144px 0 0 144px;
+  /* Empuja la imagen: 144px desde arriba y 144px desde la izquierda,
+     para centrarla dentro de #pokemon-container */
+
   position: absolute;
+
   visibility: hidden;
+  /* Oculta la Pokéball por defecto (a diferencia de "display:none",
+     "visibility:hidden" sigue ocupando espacio, solo que no se ve) */
+
   animation: wiggle 1.35s infinite;
+  /* Aplica la animación "wiggle" (definida al final del archivo),
+     que dura 1.35 segundos y se repite para siempre ("infinite") */
 }
 
 #pokemon-image {
   margin: 135px 0 0 140px;
+
   transform: scale(2.5);
+  /* Agranda la imagen del Pokémon 2.5 veces su tamaño original */
+
   filter: brightness(0);
+  /* Reduce el brillo a 0, lo que convierte la imagen en una silueta negra sólida.
+     Así el usuario ve la "sombra" del Pokémon sin saber cuál es todavía */
+
   transition: filter .5s ease-out;
+  /* Anima el cambio de "filter" suavemente en 0.5s, para que cuando se
+     revele el Pokémon (filter: none) el color aparezca gradualmente y no de golpe */
+
   position: absolute;
   left: 0;
 }
 
+/* ---- Reglas condicionales según el ESTADO del juego ----
+   Estas reglas dependen de qué clase tenga <main> en cada momento:
+   "fetching" (cargando) o "revealed" (ya se adivinó) */
+
 main.fetching #pokeball {
   visibility: visible;
+  /* Mientras se están cargando los datos, mostramos la Pokéball girando */
 }
 
 main.fetching #pokemon-image {
   visibility: hidden;
   display: none;
+  /* Y ocultamos por completo la imagen del Pokémon (todavía no hay nada que mostrar) */
 }
 
 main.fetching #choices {
   display: none;
+  /* Tampoco mostramos los botones de opciones mientras se está cargando */
 }
 
 main.revealed #pokemon-image {
   filter: none;
+  /* Cuando ya se reveló la respuesta, quitamos el filtro de brillo 0,
+     así el Pokémon se ve a full color */
 }
 
 main.revealed #answer {
   display: block;
+  /* Y mostramos el recuadro con el nombre del Pokémon */
 }
 
 #choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* Crea una grilla de 2 columnas iguales (1 fracción cada una) */
+
   grid-gap: 12px;
+  /* Espacio entre los botones, tanto horizontal como verticalmente */
 }
 
+#stats {
+  display: flex;
+  /* Ponemos "Correctas" e "Incorrectas" en fila, una al lado de la otra */
+
+  justify-content: space-between;
+  /* Empuja un texto hacia la izquierda y el otro hacia la derecha */
+
+  margin-top: 16px;
+  /* Separación respecto a los botones de opciones (#choices) que están arriba */
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#correct-count {
+  color: #0dff0d;
+  /* Verde, el mismo tono que usamos en button.correct, para que se asocie visualmente */
+}
+
+#incorrect-count {
+  color: #ea2e25;
+  /* Rojo, el mismo tono que usamos en button.incorrect */
+}
+
+/* ---- Animación de la Pokéball ---- */
 @keyframes wiggle {
-  0% { transform: rotate(0deg); }
-  80% { transform: rotate(0deg); }
-  85% { transform: rotate(6deg); }
-  95% { transform: rotate(-6deg); }
-  100% { transform: rotate(0deg); }
+  /* Define los "fotogramas clave" de la animación "wiggle" usada arriba en #pokeball.
+     Cada porcentaje indica en qué punto de la duración total (1.35s) ocurre ese estado */
+
+  0%   { transform: rotate(0deg); }   /* Empieza sin rotación */
+  80%  { transform: rotate(0deg); }   /* Se queda quieta el 80% del tiempo */
+  85%  { transform: rotate(6deg); }   /* Gira un poco a la derecha */
+  95%  { transform: rotate(-6deg); }  /* Luego gira un poco a la izquierda */
+  100% { transform: rotate(0deg); }   /* Y vuelve a su posición original */
+  /* El resultado es un pequeño "temblor" rápido cada 1.35 segundos,
+     como si la Pokéball estuviera a punto de abrirse */
 }
