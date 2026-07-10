@@ -12,7 +12,7 @@ Un divertido juego web interactivo construido con **Vanilla JavaScript** donde l
 * **Speech Synthesis:** Utiliza la Web Speech API del navegador para pronunciar el nombre del Pokémon en voz alta una vez que el usuario adivina.
 * **CSS Animations:** Incluye retroalimentación visual, revelado de la silueta mediante filtros (`brightness`) y animaciones divertidas como el movimiento de la Pokéball (`wiggle`).
 
-## 🛠️ Tech Stack
+## 🛠️ Lenguajes utilizados
 
 Este proyecto es un ejercicio práctico de desarrollo Full Stack a nivel Frontend, construido con:
 
@@ -21,7 +21,7 @@ Este proyecto es un ejercicio práctico de desarrollo Full Stack a nivel Fronten
 * **JavaScript (ES6+):** Lógica del juego, manipulación del DOM y consumo de APIs usando `async/await`.
 * **REST API:** Integración con servicios externos.
 
-## 📂 Project Structure
+## 📂 Estructura del Proyecto
 
 El proyecto sigue una separación clara de responsabilidades (Separation of Concerns):
 
@@ -33,7 +33,7 @@ El proyecto sigue una separación clara de responsabilidades (Separation of Conc
 └── index.html       # Estructura principal de la interfaz
 \`\`\`
 
-## 🧑‍💻 Best Practices & Workflow
+## 🧑‍💻 Practicas y Flujo de Trabajo
 
 Este proyecto se ha desarrollado siguiendo estándares profesionales de la industria:
 
