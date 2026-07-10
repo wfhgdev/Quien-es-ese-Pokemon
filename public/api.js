@@ -1,45 +1,58 @@
+const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon?limit=';
+const MAX_POKEMON_GENERATION_ONE = 151;
+const TOTAL_CHOICES = 4;
+
 window.getPokeData = async function() {
-  const pokemon = await getPokemon();
-  const randomPokemon = shuffle(pokemon);
-  const pokemonChoices = get4Pokemon(randomPokemon);
-  const [ firstPokemon ] = pokemonChoices;
-  const image = getPokemonImage(firstPokemon);
+  try {
+    const allPokemon = await fetchAllPokemon();
+    const shuffledPokemon = shuffleArray(allPokemon);
+    const pokemonChoices = getSpecificAmountOfPokemon(shuffledPokemon, TOTAL_CHOICES);
+    
+    const firstPokemon = pokemonChoices[0];
+    const pokemonImage = getPokemonImageUrl(firstPokemon);
 
-  return { 
-    pokemonChoices: shuffle(pokemonChoices),
-    correct: {
-      image,
-      name: firstPokemon.name,
-    }
-  };
+    return { 
+      pokemonChoices: shuffleArray(pokemonChoices),
+      correct: {
+        image: pokemonImage,
+        name: firstPokemon.name,
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching Pokemon data: ", error);
+    // You could also trigger a visual error state in the HTML here
+  }
 };
 
-async function getPokemon() {
-  const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
-  const pokemon = await res.json();
+async function fetchAllPokemon() {
+  const response = await fetch(`${POKEMON_API_URL}${MAX_POKEMON_GENERATION_ONE}`);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const pokemonData = await response.json();
   
-  return pokemon.results;
+  return pokemonData.results;
 }
 
-function shuffle(unshuffled) {
-  const shuffled = unshuffled
-    .map((value) => ({ value, sort: Math.random() }))
+function shuffleArray(unshuffledArray) {
+  const shuffledArray = unshuffledArray
+    .map((item) => ({ item, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+    .map(({ item }) => item);
   
-  return shuffled;
+  return shuffledArray;
 }
 
-function get4Pokemon(randomPokemon) {
-  return randomPokemon.splice(0, 4);
+function getSpecificAmountOfPokemon(randomPokemonList, amount) {
+  return randomPokemonList.splice(0, amount);
 }
 
-function getPokemonImage({ url }) {
-  const number = getNumber(url);
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png`;
-};
+function getPokemonImageUrl({ url }) {
+  const pokemonNumber = extractPokemonNumberFromUrl(url);
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonNumber}.png`;
+}
 
-function getNumber(url) {
-  const numberRegEx = /(\d+)\/$/;
-  return (url.match(numberRegEx) || [])[1];
+function extractPokemonNumberFromUrl(url) {
+  const numberRegex = /(\d+)\/$/;
+  return (url.match(numberRegex) || [])[1];
 }
