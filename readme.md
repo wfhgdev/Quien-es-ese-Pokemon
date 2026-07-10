@@ -25,13 +25,13 @@ Este proyecto es un ejercicio práctico de desarrollo Full Stack a nivel Fronten
 
 El proyecto sigue una separación clara de responsabilidades (Separation of Concerns):
 
-\`\`\`text
+```text
 ├── public/
 │   ├── api.js       # Lógica de conexión a la API y procesamiento de datos
 │   ├── index.js     # Lógica principal del juego, eventos del DOM y Web Speech API
 │   └── styles.css   # Reglas de estilo y animaciones
 └── index.html       # Estructura principal de la interfaz
-\`\`\`
+```
 
 ## 🧑‍💻 Practicas y Flujo de Trabajo
 
