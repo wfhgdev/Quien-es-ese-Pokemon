@@ -1,6 +1,6 @@
 # ¿Quién es ese Pokémon? 🎮🔍
 
-Un divertido juego web interactivo construido con **Vanilla JavaScript** donde los jugadores deben adivinar qué Pokémon se esconde tras la silueta. ¡Pon a prueba tus conocimientos como entrenador Pokémon!
+Un divertido juego web interactivo construido con **JavaScript** donde los jugadores deben adivinar qué Pokémon se esconde tras la silueta. ¡Pon a prueba tus conocimientos como entrenador Pokémon!
 
 ## GitHub Pages
 * [[**Sitio Web en GitHub Pages**](https://wfhgdev.github.io/Quien-es-ese-Pokemon/)]

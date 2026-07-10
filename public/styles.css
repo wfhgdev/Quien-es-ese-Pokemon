@@ -30,26 +30,59 @@ body {
 main {
   position: relative;
   /* "relative" convierte a <main> en el "punto de referencia" para
-     cualquier elemento hijo que use position: absolute (como #pokeball,
+     cualquier elemento hijo que use position: absolute (como
      #text-overlay, #play). Sin esto, esos elementos se posicionarían
      respecto a toda la página en vez de respecto a esta caja */
 
-  width: 575px;
-  /* Ancho fijo del tablero de juego */
+  width: 100%;
+  max-width: 575px;
+  /* MEJORA: antes era "width: 575px" (un ancho fijo).
+     Ahora usamos "width: 100%" junto con "max-width: 575px":
+     esto significa "ocupa todo el ancho disponible, pero nunca más
+     de 575px". En una pantalla grande (PC) el resultado es idéntico
+     a antes, porque el ancho disponible supera los 575px y el
+     max-width es quien manda. Pero en un celular angosto, el tablero
+     ahora SÍ se encoge para caber en la pantalla, en vez de quedar
+     más ancho que el celular y obligar a hacer scroll horizontal */
+
+  margin: 40px auto 0;
+  /* MEJORA: agrega el margen superior que pediste (40px), tanto en
+     PC como en móvil. El "auto" en la posición horizontal centra
+     el tablero (esto es un extra: como ahora el ancho es variable,
+     "margin: auto" es la forma clásica en CSS de centrar un bloque;
+     lo dejamos como refuerzo aunque el body ya centra con flexbox) */
 
   background-image: url('https://res.cloudinary.com/dzynqn10l/image/upload/v1633196203/Msc/pokemon-bg_ig4uv3.jpg');
   /* Imagen de fondo tipo "escenario de batalla Pokémon" */
 
   background-size: 110%;
-  /* Agranda un poco la imagen de fondo (110% de su tamaño normal) */
+  /* Agranda un poco la imagen de fondo (110% de su tamaño normal).
+     Como este valor es un PORCENTAJE (no píxeles fijos), ya escala
+     automáticamente junto con el ancho de <main>, sea cual sea */
 
   background-repeat: no-repeat;
   /* Evita que la imagen se repita en mosaico */
 }
 
 #pokemon-container {
-  height: 355px;
-  /* Alto fijo para el área donde viven la Pokéball y la imagen del Pokémon */
+  position: relative;
+  /* MEJORA: antes #pokeball y #pokemon-image se posicionaban respecto a
+     <main> (porque eran los únicos elementos con position:relative en
+     la cadena de ancestros). Ahora que #pokemon-container también es
+     "relative", se convierte en el nuevo punto de referencia para sus
+     hijos absolutos, lo cual es más lógico: la Pokéball y el sprite
+     deben centrarse respecto a ESTA caja, no respecto a todo <main>
+     (que también incluye los botones de abajo) */
+
+  aspect-ratio: 575 / 355;
+  /* MEJORA: antes era "height: 355px" (una altura fija en píxeles).
+     aspect-ratio le dice al navegador "mantén siempre esta proporción
+     entre ancho y alto" (575 de ancho por cada 355 de alto, la misma
+     proporción que tenía el diseño original a tamaño completo).
+     Como el ancho de #pokemon-container ahora varía según la pantalla
+     (hereda el ancho de <main>, que es fluido), la altura se recalcula
+     automáticamente para mantener la misma proporción, sin importar
+     qué tan angosta sea la pantalla */
 }
 
 #answer {
@@ -211,11 +244,24 @@ button:disabled:hover {
 }
 
 #pokeball {
-  width: 78px;
+  width: 13.57%;
+  /* MEJORA: antes "width: 78px" (fijo). 78px equivale a un 13.57% del
+     ancho original del tablero (78 / 575 * 100). Al usar porcentaje,
+     la Pokéball se agranda o encoge junto con el tablero completo,
+     así que su tamaño relativo al fondo se mantiene siempre igual */
 
-  margin: 144px 0 0 144px;
-  /* Empuja la imagen: 144px desde arriba y 144px desde la izquierda,
-     para centrarla dentro de #pokemon-container */
+  top: 40.56%;
+  left: 25.04%;
+  /* MEJORA: antes esto se lograba con "margin: 144px 0 0 144px", un
+     empuje en píxeles FIJOS desde arriba y desde la izquierda. El
+     problema: si el tablero se achicaba (como pasaba en el celular),
+     144px seguía siendo 144px, así que la Pokéball terminaba mucho
+     más a la derecha y más abajo de lo que debía respecto al fondo
+     (que sí se achicaba). Ahora usamos "top" y "left" en PORCENTAJE
+     del contenedor (144 / 355 * 100 ≈ 40.56%, y 144 / 575 * 100 ≈ 25.04%).
+     Un porcentaje siempre se recalcula según el tamaño actual del
+     contenedor, así que la Pokéball queda en el mismo lugar relativo
+     del destello blanco sin importar el tamaño de la pantalla */
 
   position: absolute;
 
@@ -229,10 +275,23 @@ button:disabled:hover {
 }
 
 #pokemon-image {
-  margin: 135px 0 0 140px;
+  top: 38.03%;
+  left: 24.35%;
+  /* MEJORA: antes esto se lograba con "margin: 135px 0 0 140px" y
+     "left: 0" combinados (una mezcla confusa de margen fijo + posición).
+     Igual que con la Pokéball, esos píxeles fijos no se adaptaban al
+     tamaño de la pantalla, por lo que en el celular el sprite quedaba
+     descentrado respecto al destello blanco del fondo. Ahora usamos
+     "top" y "left" en PORCENTAJE del contenedor (135 / 355 * 100 ≈ 38.03%,
+     y 140 / 575 * 100 ≈ 24.35%), que se recalculan automáticamente
+     según el tamaño real de #pokemon-container en cada pantalla */
 
   transform: scale(2.5);
-  /* Agranda la imagen del Pokémon 2.5 veces su tamaño original */
+  /* Agranda la imagen del Pokémon 2.5 veces su tamaño original.
+     Esto no cambia con el tamaño de pantalla: el sprite crece siempre
+     2.5 veces respecto a SU tamaño real (ej. 96x96px), no respecto
+     al tablero. Como el tablero completo también se achica en el
+     celular, el resultado visual sigue viéndose proporcional */
 
   filter: brightness(0);
   /* Reduce el brillo a 0, lo que convierte la imagen en una silueta negra sólida.
@@ -243,7 +302,6 @@ button:disabled:hover {
      revele el Pokémon (filter: none) el color aparezca gradualmente y no de golpe */
 
   position: absolute;
-  left: 0;
 }
 
 /* ---- Reglas condicionales según el ESTADO del juego ----
@@ -322,4 +380,23 @@ main.revealed #answer {
   100% { transform: rotate(0deg); }   /* Y vuelve a su posición original */
   /* El resultado es un pequeño "temblor" rápido cada 1.35 segundos,
      como si la Pokéball estuviera a punto de abrirse */
+}
+
+/* ---- Ajuste responsivo para pantallas muy angostas (celulares chicos) ---- */
+@media (max-width: 400px) {
+  /* MEJORA: a propósito NO achicamos el tamaño de letra ni el alto de los
+     botones (eso los volvería difíciles de tocar con el dedo). Solo
+     reducimos un poco el relleno HORIZONTAL, para que nombres de Pokémon
+     largos (como "charizard" o "nidoqueen") no desborden el botón en
+     pantallas muy angostas. El área táctil sigue siendo cómoda */
+
+  button {
+    padding: 10px 16px;
+  }
+
+  #controls {
+    padding: 20px 24px;
+    /* Reducimos un poco el espacio interno lateral de los controles,
+       para aprovechar mejor el ancho disponible en pantallas chicas */
+  }
 }
