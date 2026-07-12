@@ -5,13 +5,8 @@
 // prepararlos, y devolverlos listos para que index.js los use.
 // ======================================================
 
-// URL base de la PokéAPI. Le falta el número de Pokémon que queremos,
-// por eso termina en "limit=" (se lo pegamos después)
-const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon?limit=';
-
-// Solo existen 151 Pokémon en la "primera generación" (Kanto).
-// Usamos esta constante para no "hardcodear" el número 151 varias veces
-const MAX_POKEMON_GENERATION_ONE = 151;
+// URL base de la PokéAPI para pedir una lista de Pokémon
+const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon';
 
 // Cuántas opciones de respuesta le vamos a mostrar al usuario (4 botones)
 const TOTAL_CHOICES = 4;
@@ -19,7 +14,14 @@ const TOTAL_CHOICES = 4;
 // window.getPokeData = ... : guardamos la función dentro de "window"
 // para que esté disponible globalmente y pueda ser usada desde index.js
 // (recordemos que index.js se carga DESPUÉS de este archivo)
-window.getPokeData = async function() {
+//
+// MEJORA: esta función ahora RECIBE un parámetro "range", un objeto con
+// la forma { start, end } (por ejemplo { start: 1, end: 151 } para Kanto).
+// index.js lee ese rango desde el <select id="generation"> del HTML y se
+// lo pasa aquí. Así, api.js no necesita saber nada sobre "generaciones"
+// ni "Kanto" ni "Johto": solo sabe traer Pokémon de un rango de números,
+// y es index.js quien decide qué rango corresponde a cada generación
+window.getPokeData = async function(range) {
   // "async" significa que esta función puede usar "await" adentro,
   // es decir, puede "esperar" a que terminen operaciones que toman tiempo
   // (como pedirle datos a internet) sin bloquear el resto del programa
@@ -32,12 +34,13 @@ window.getPokeData = async function() {
   // mensaje visual). Así cada archivo cumple un solo rol:
   // api.js trae los datos, index.js decide qué hacer con el resultado (o el error)
 
-  const allPokemon = await fetchAllPokemon();
-  // Esperamos (await) a que fetchAllPokemon() termine de traer los 151 Pokémon.
-  // Si fetchAllPokemon() lanza un error (throw), la ejecución de esta función
-  // se detiene aquí mismo y el error viaja hacia quien llamó a getPokeData()
+  const generationPokemon = await fetchPokemonRange(range);
+  // Esperamos (await) a que fetchPokemonRange() termine de traer únicamente
+  // los Pokémon del rango pedido (ej: solo los 151 de Kanto, o solo los
+  // 120 de Paldea). Si fetchPokemonRange() lanza un error (throw), la
+  // ejecución se detiene aquí mismo y el error viaja hacia quien llamó a getPokeData()
 
-  const shuffledPokemon = shuffleArray(allPokemon);
+  const shuffledPokemon = shuffleArray(generationPokemon);
   // Mezclamos la lista al azar, como barajar un mazo de cartas
 
   const pokemonChoices = getSpecificAmountOfPokemon(shuffledPokemon, TOTAL_CHOICES);
@@ -64,12 +67,23 @@ window.getPokeData = async function() {
   };
 };
 
-// Función que realmente hace la petición (fetch) a la PokéAPI
-async function fetchAllPokemon() {
-  const response = await fetch(`${POKEMON_API_URL}${MAX_POKEMON_GENERATION_ONE}`);
-  // fetch() hace la petición HTTP a la URL final, algo como:
-  // https://pokeapi.co/api/v2/pokemon?limit=151
-  // await espera a que el servidor responda
+// Función que realmente hace la petición (fetch) a la PokéAPI,
+// pidiendo SOLO los Pokémon dentro del rango { start, end } recibido
+async function fetchPokemonRange({ start, end }) {
+  const offset = start - 1;
+  // La PokéAPI numera su lista empezando en 0 (offset=0 es el Pokémon #1),
+  // por eso restamos 1: si queremos empezar en el Pokémon #152 (Johto),
+  // el offset correcto es 151, no 152
+
+  const limit = end - start + 1;
+  // Cuántos Pokémon hay que pedir en total dentro del rango.
+  // Ejemplo: Johto va del #152 al #251 → 251 - 152 + 1 = 100 Pokémon
+
+  const response = await fetch(`${POKEMON_API_URL}?offset=${offset}&limit=${limit}`);
+  // Arma una URL como:
+  // https://pokeapi.co/api/v2/pokemon?offset=151&limit=100
+  // que le pide a la PokéAPI: "dame 100 Pokémon, empezando después del 151"
+  // (es decir, del 152 en adelante) — así solo trae Pokémon de esa generación
 
   if (!response.ok) {
     // response.ok es true si el status HTTP es 200-299 (todo bien)
@@ -84,7 +98,7 @@ async function fetchAllPokemon() {
 
   return pokemonData.results;
   // La PokéAPI devuelve varios campos, pero solo nos interesa "results",
-  // que es el array con los 151 Pokémon (cada uno con nombre y url)
+  // que es el array con los Pokémon del rango pedido (cada uno con nombre y url)
 }
 
 // Función que mezcla (baraja) un array al azar

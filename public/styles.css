@@ -17,14 +17,52 @@ body {
 
   display: flex;
   /* Convertimos el body en un contenedor flex para poder centrar
-     fácilmente a su hijo (<main>) horizontalmente */
+     fácilmente a sus hijos horizontalmente */
 
-  justify-content: center;
-  /* Centra a <main> en el eje horizontal.
-     Nota: solo centramos horizontalmente, no verticalmente,
-     tal como se pidió (si en el futuro se quiere centrar también
-     verticalmente, se puede agregar align-items: center y darle
-     una altura al body, por ejemplo min-height: 100vh) */
+  flex-direction: column;
+  /* MEJORA: ahora el body tiene DOS hijos en el HTML: #game-options
+     (el selector de generación) y <main> (el tablero). Con
+     "flex-direction: column" los apilamos uno debajo del otro, en vez
+     de que queden lado a lado (que es el comportamiento por defecto
+     de flexbox, pensado para un solo hijo como antes) */
+
+  align-items: center;
+  /* Centra horizontalmente a CADA hijo (el selector y el tablero),
+     que es el equivalente a "justify-content: center" pero para
+     cuando la dirección del flex es "column" en vez de "row" */
+}
+
+#game-options {
+  margin-top: 40px;
+  /* El margen superior que pediste (40px) ahora vive aquí, ya que
+     este es el primer elemento visible de la página */
+
+  margin-bottom: 16px;
+  /* Un pequeño espacio antes de que empiece el tablero */
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+#generation {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  /* MEJORA: index.js lee el "value" de la opción elegida (ej: "1-151")
+     cuando el usuario presiona Play, y se lo pasa a api.js para que
+     traiga solo los Pokémon de esa generación */
+}
+
+#generation:disabled {
+  /* MEJORA: igual que con los botones, mientras se está cargando una
+     nueva ronda, index.js deshabilita este selector para que el usuario
+     no pueda cambiar de generación a mitad de la petición */
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 main {
@@ -44,13 +82,6 @@ main {
      max-width es quien manda. Pero en un celular angosto, el tablero
      ahora SÍ se encoge para caber en la pantalla, en vez de quedar
      más ancho que el celular y obligar a hacer scroll horizontal */
-
-  margin: 40px auto 0;
-  /* MEJORA: agrega el margen superior que pediste (40px), tanto en
-     PC como en móvil. El "auto" en la posición horizontal centra
-     el tablero (esto es un extra: como ahora el ancho es variable,
-     "margin: auto" es la forma clásica en CSS de centrar un bloque;
-     lo dejamos como refuerzo aunque el body ya centra con flexbox) */
 
   background-image: url('https://res.cloudinary.com/dzynqn10l/image/upload/v1633196203/Msc/pokemon-bg_ig4uv3.jpg');
   /* Imagen de fondo tipo "escenario de batalla Pokémon" */
@@ -94,47 +125,80 @@ main {
 #bg-overlay {
   color: #fff;
   position: absolute;
-  /* Se posiciona respecto a <main> (que es "relative") */
+  /* Se posiciona respecto a #pokemon-container (que es "relative") */
 
   background-color: #dd1716;
   /* Rojo, simulando el círculo de fondo del típico letrero "¡Es...!" de Pokémon */
 
-  right: 25px;
-  width: 170px;
-  height: 170px;
-  top: 60px;
+  right: 4.35%;
+  width: 29.57%;
+  height: 47.89%;
+  top: 16.9%;
+  /* MEJORA: antes right/width/height/top eran píxeles fijos (25px, 170px,
+     170px, 60px). Convertidos a porcentaje del contenedor, igual que hicimos
+     con la Pokéball y el sprite, para que el círculo se achique junto con
+     el resto del tablero en pantallas angostas, en vez de quedar gigante */
 
   border-radius: 50%;
-  /* 50% convierte el cuadrado en un círculo perfecto */
+  /* 50% convierte el cuadrado en un círculo perfecto (esto ya era
+     porcentaje antes, y sigue funcionando igual: como width y height
+     siempre son iguales en cualquier pantalla, el resultado sigue
+     siendo un círculo perfecto, nunca un óvalo) */
 }
 
 #text-overlay {
   position: absolute;
-  right: 20px;
-  top: 100px;
-  /* Se coloca encima del círculo rojo (#bg-overlay), un poco desplazado */
+  right: 3.48%;
+  top: 28.17%;
+  /* MEJORA: igual que el círculo rojo, "right" y "top" pasaron de
+     píxeles fijos (20px, 100px) a porcentaje del contenedor, para que
+     escalen junto con el tablero */
 
   background-color: #ffcb02;
   /* Amarillo, como el recuadro de texto de un cómic */
 
-  border: solid 7px #2c70ae;
-  /* Borde azul grueso */
+  border: clamp(4px, 1.22vw, 7px) solid #2c70ae;
+  /* MEJORA: border-width NO admite porcentajes en CSS (es una de las
+     pocas propiedades que no los acepta), así que aquí usamos
+     clamp(mínimo, preferido, máximo) en su lugar. "1.22vw" significa
+     "1.22% del ancho de LA PANTALLA" (vw = viewport width); como
+     nuestro tablero mide como máximo 575px y en pantallas angostas
+     ocupa casi todo el ancho de la pantalla, 1.22vw se comporta como
+     un porcentaje del tablero. clamp() además le pone un piso (4px,
+     para que nunca sea invisible) y un techo (7px, el valor original
+     en PC, para que nunca sea más grueso de lo que ya se veía bien) */
 
-  padding: 20px;
-  min-width: 130px;
+  padding: 3.48%;
+  /* Esta sí es un porcentaje normal. Dato curioso de CSS: el padding
+     en porcentaje SIEMPRE se calcula sobre el ANCHO del contenedor,
+     incluso el padding de arriba/abajo (no solo el de los lados) */
+
+  min-width: 22.61%;
 
   font-family: 'Bangers', Arial, sans-serif;
   /* Usamos la fuente "Bangers" que importamos en el HTML.
      Si por algún motivo no carga, usamos Arial como respaldo */
 
-  font-size: 36px;
+  font-size: clamp(20px, 6.26vw, 36px);
+  /* MEJORA: el font-size en porcentaje se calcula respecto al tamaño
+     de letra del elemento PADRE, no respecto al ancho del tablero, así
+     que tampoco nos sirve aquí. Usamos la misma técnica de clamp() +
+     vw: en PC, el texto siempre se ve a 36px (el techo). En el celular,
+     se va achicando junto con la pantalla, pero nunca baja de 20px,
+     para que el nombre del Pokémon siga siendo legible */
+
   letter-spacing: 1.2px;
   color: #3ea2fe;
 
   text-shadow: 2px 2px #1d366c;
   /* Sombra al texto para darle un efecto de "letrero de cómic" */
 
-  border-radius: 20px;
+  border-radius: clamp(10px, 3.48vw, 20px);
+  /* Mismo motivo que border-width: border-radius en porcentaje se
+     calcula raro (relativo al tamaño de la propia caja, no del
+     contenedor), así que preferimos clamp() + vw para mantener la
+     misma lógica de escalado en todas las propiedades de esta caja */
+
   text-align: center;
 }
 
@@ -176,10 +240,14 @@ button:hover {
 
 button.correct,
 button.incorrect {
-  /* Estilos compartidos por ambas clases: quitamos la sombra y
-     ponemos un color de texto claro que se lea bien sobre verde o rojo */
-  color: #d9fcd9;
+  /* MEJORA: antes el texto usaba "#d9fcd9" (un verde muy clarito) sobre
+     fondos MUY brillantes (verde neón o rojo), lo que daba muy poco
+     contraste y costaba leer el nombre del Pokémon. Ahora usamos un
+     color casi negro, que sí se lee claramente sobre ambos fondos */
+  color: #14210f;
   box-shadow: none;
+  font-weight: 700;
+  /* Un poco más de peso en la letra, para reforzar la legibilidad */
 }
 
 button.correct {
@@ -190,6 +258,23 @@ button.correct {
 button.incorrect {
   background: #ea2e25;
   /* Rojo: se agrega vía JS cuando el usuario falla */
+}
+
+button.correct::before {
+  content: '✓ ';
+  /* MEJORA (accesibilidad): el rojo y el verde son justo la combinación
+     de colores más difícil de distinguir para las personas con
+     daltonismo (el tipo más común). Por eso no dependemos solo del
+     color: agregamos un símbolo ✓ antes del texto en la respuesta
+     correcta, para que el estado se entienda aunque no se perciba
+     bien la diferencia de color */
+}
+
+button.incorrect::before {
+  content: '✗ ';
+  /* Mismo motivo: un símbolo ✗ antes del texto en la respuesta incorrecta.
+     ::before es un "pseudo-elemento": permite insertar contenido antes
+     del contenido real del botón sin tener que tocar el HTML ni el JS */
 }
 
 #play {
@@ -275,23 +360,29 @@ button:disabled:hover {
 }
 
 #pokemon-image {
-  top: 38.03%;
-  left: 24.35%;
-  /* MEJORA: antes esto se lograba con "margin: 135px 0 0 140px" y
-     "left: 0" combinados (una mezcla confusa de margen fijo + posición).
-     Igual que con la Pokéball, esos píxeles fijos no se adaptaban al
-     tamaño de la pantalla, por lo que en el celular el sprite quedaba
-     descentrado respecto al destello blanco del fondo. Ahora usamos
-     "top" y "left" en PORCENTAJE del contenedor (135 / 355 * 100 ≈ 38.03%,
-     y 140 / 575 * 100 ≈ 24.35%), que se recalculan automáticamente
-     según el tamaño real de #pokemon-container en cada pantalla */
+  position: absolute;
+  top: 17.75%;
+  left: 11.83%;
+  width: 41.74%;
+  height: auto;
+  /* MEJORA: antes el sprite (que siempre mide 96x96px real, sin importar
+     el Pokémon) se agrandaba con "transform: scale(2.5)", es decir,
+     "hazte 2.5 veces MÁS GRANDE QUE TU TAMAÑO REAL DE 96px", sin importar
+     el tamaño del tablero. En pantallas grandes esto se veía bien porque
+     96px x 2.5 = 240px encajaba perfecto en un tablero de 575px. Pero en
+     el celular el tablero se achica (por ejemplo a 360px) mientras el
+     sprite se seguía agrandando a los mismos 240px de siempre: por eso en
+     tus capturas se veía enorme, ocupando casi toda la pantalla.
 
-  transform: scale(2.5);
-  /* Agranda la imagen del Pokémon 2.5 veces su tamaño original.
-     Esto no cambia con el tamaño de pantalla: el sprite crece siempre
-     2.5 veces respecto a SU tamaño real (ej. 96x96px), no respecto
-     al tablero. Como el tablero completo también se achica en el
-     celular, el resultado visual sigue viéndose proporcional */
+     Ahora, en cambio, el ancho es un PORCENTAJE del contenedor
+     (240 / 575 * 100 ≈ 41.74%), así que el sprite siempre mide "41.74%
+     del ancho disponible", sea cual sea ese ancho. "height: auto" hace
+     que el navegador calcule el alto automáticamente para no deformar
+     la imagen (recordemos que el sprite real es cuadrado, 96x96px).
+
+     Los valores de "top" y "left" están recalculados para que, ya sin el
+     "transform: scale" (que antes agrandaba la imagen manteniendo su
+     CENTRO fijo), el sprite caiga visualmente en el mismo lugar de antes */
 
   filter: brightness(0);
   /* Reduce el brillo a 0, lo que convierte la imagen en una silueta negra sólida.
@@ -300,8 +391,6 @@ button:disabled:hover {
   transition: filter .5s ease-out;
   /* Anima el cambio de "filter" suavemente en 0.5s, para que cuando se
      revele el Pokémon (filter: none) el color aparezca gradualmente y no de golpe */
-
-  position: absolute;
 }
 
 /* ---- Reglas condicionales según el ESTADO del juego ----

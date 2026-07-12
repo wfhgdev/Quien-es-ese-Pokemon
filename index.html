@@ -1,21 +1,66 @@
 <!DOCTYPE html>
+<!-- Le dice al navegador que este documento usa HTML5 -->
 <html lang="es">
+<!-- lang="es" ayuda a los lectores de pantalla y a Google a saber que la página está en español -->
+
 <head>
   <meta charset="UTF-8">
+  <!-- Define la codificación de caracteres, para que tildes y ñ se vean bien -->
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Hace que la página se vea bien en celulares, ajustando el ancho a la pantalla del dispositivo -->
+
   <link rel="stylesheet" type="text/css" href="./public/styles.css">
+  <!-- Conecta este HTML con nuestro archivo de estilos (la "pintura y decoración" de la casa) -->
+
   <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+  <!-- Importa la fuente "Bangers" (estilo cómic) desde Google Fonts, usada en el texto del resultado -->
+
   <title>¿Quién es ese Pokémon?</title>
+  <!-- Este es el texto que aparece en la pestaña del navegador -->
 </head>
 
 <body>
+  <!-- Aquí empieza todo el contenido visible de la página -->
+
+  <div id="game-options">
+    <!-- MEJORA: selector para elegir de qué generación de Pokémon se
+         quiere jugar. Vive FUERA de <main> porque es una configuración
+         de la partida, no parte del tablero de juego en sí -->
+
+    <label for="generation">Generación:</label>
+
+    <select id="generation">
+      <!-- Cada <option> guarda en su "value" el rango de números de la
+           Pokédex Nacional que le corresponde a esa generación, con el
+           formato "inicio-fin". index.js lee ese valor y se lo pasa a
+           api.js para pedir solo esos Pokémon.
+           Datos verificados: la Generación 9 (Paldea) llega hasta el
+           Pokémon #1025, que es el total actual de la Pokédex Nacional -->
+      <option value="1-151">Kanto (Generación 1)</option>
+      <option value="152-251">Johto (Generación 2)</option>
+      <option value="252-386">Hoenn (Generación 3)</option>
+      <option value="387-493">Sinnoh (Generación 4)</option>
+      <option value="494-649">Teselia (Generación 5)</option>
+      <option value="650-721">Kalos (Generación 6)</option>
+      <option value="722-809">Alola (Generación 7)</option>
+      <option value="810-905">Galar (Generación 8)</option>
+      <option value="906-1025">Paldea (Generación 9)</option>
+    </select>
+  </div>
+
   <main class="fetching">
     <!-- <main> es el contenedor principal del juego.
          La clase "fetching" se usa en styles.css para saber cuándo mostrar la Pokéball
          girando (mientras se están cargando los datos) -->
 
     <div id="pokemon-container">
-      <!-- Contenedor que agrupa la Pokéball y la imagen del Pokémon, uno encima del otro -->
+      <!-- Contenedor que agrupa la Pokéball, la imagen del Pokémon y el recuadro
+           de respuesta. MEJORA: el recuadro de respuesta (#answer) se movió aquí
+           adentro (antes era hermano de este div, directamente dentro de <main>).
+           Así, tanto la silueta como el recuadro de respuesta se posicionan
+           respecto al MISMO contenedor y escalan juntos y de forma proporcional
+           en cualquier tamaño de pantalla -->
 
       <img id="pokeball" src="https://res.cloudinary.com/dzynqn10l/image/upload/v1633196610/Msc/pokeball_zeoqii.webp">
       <!-- Imagen de la Pokéball que gira (animación "wiggle" definida en el CSS) mientras se cargan los datos -->
@@ -24,17 +69,11 @@
       <!-- Imagen del Pokémon misterioso.
            El src que ves ahora es un GIF transparente de 1x1 píxel, o sea "imagen vacía".
            index.js se encarga de reemplazar este src por la imagen real del Pokémon -->
-    </div>
 
-    <div id="answer">
-      <!-- Esta caja está oculta por defecto (display: none en el CSS).
-           Solo se muestra cuando el usuario ya adivinó (clase "revealed" en <main>) -->
-
-      <div id="bg-overlay"></div>
-      <!-- Es el círculo rojo de fondo que simula el "diálogo" tipo Pokémon -->
-
-      <div id="text-overlay"></div>
-      <!-- Aquí index.js escribe el nombre del Pokémon una vez que el usuario adivina -->
+      <div id="answer">
+        <div id="bg-overlay"></div>
+        <div id="text-overlay"></div>
+      </div>
     </div>
 
     <section id="controls">

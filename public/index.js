@@ -34,6 +34,9 @@ const choices = document.querySelector('#choices');
 const playBtn = document.querySelector('#play');
 // El botón "Play"
 
+const generationSelect = document.querySelector('#generation');
+// El <select> donde el usuario elige qué generación de Pokémon jugar
+
 const correctCountEl = document.querySelector('#correct-count');
 // El <span> donde se muestra el número de respuestas correctas
 
@@ -62,9 +65,11 @@ addAnswerHandler();
 // Se ejecuta cuando el usuario hace clic en "Play"
 async function fetchData() {
   playBtn.disabled = true;
-  // MEJORA: deshabilitamos el botón mientras se está cargando, para que el
-  // usuario no pueda hacer clic varias veces y disparar varias peticiones
-  // a la PokéAPI al mismo tiempo (lo que podría dejar el juego en un estado raro)
+  generationSelect.disabled = true;
+  // MEJORA: deshabilitamos el botón Y el selector de generación mientras
+  // se está cargando, para que el usuario no pueda hacer clic varias veces
+  // ni cambiar de generación a mitad de una petición (lo que podría dejar
+  // el juego en un estado raro, mezclando datos de dos generaciones distintas)
 
   hideError();
   // MEJORA: por si quedó un mensaje de error visible de un intento anterior,
@@ -78,10 +83,14 @@ async function fetchData() {
     // window.getPokeData() fallaba, el usuario se quedaba viendo la
     // Pokéball girar para siempre, sin explicación. Ahora sí lo manejamos aquí
 
-    gameData = await window.getPokeData();
+    const range = getSelectedGenerationRange();
+    // Leemos qué generación eligió el usuario en el <select>
+
+    gameData = await window.getPokeData(range);
     // Le pedimos los datos al "mensajero" (api.js) y ESPERAMOS (await)
-    // a que responda antes de seguir. window.getPokeData() es la función
-    // que definimos en api.js con "window.getPokeData = async function() {...}".
+    // a que responda antes de seguir, pasándole el rango de Pokédex
+    // que corresponde a la generación elegida. window.getPokeData() es
+    // la función que definimos en api.js con "window.getPokeData = async function(range) {...}".
     // Si esta línea lanza un error, saltamos directo al bloque catch de abajo
 
     showSilhouette();
@@ -99,11 +108,23 @@ async function fetchData() {
 
   } finally {
     // El bloque "finally" se ejecuta SIEMPRE, haya habido error o no.
-    // Lo usamos para asegurarnos de que el botón Play vuelva a habilitarse
-    // pase lo que pase, y así el usuario siempre pueda intentar de nuevo
+    // Lo usamos para asegurarnos de que el botón Play y el selector vuelvan
+    // a habilitarse pase lo que pase, y así el usuario siempre pueda intentar de nuevo
 
     playBtn.disabled = false;
+    generationSelect.disabled = false;
   }
+}
+
+// Lee el <option> seleccionado en #generation y devuelve su rango como
+// un objeto { start, end } de números, listo para pasarle a api.js
+function getSelectedGenerationRange() {
+  const [start, end] = generationSelect.value.split('-').map(Number);
+  // El "value" de cada <option> en el HTML tiene el formato "inicio-fin"
+  // (ej: "152-251"). .split('-') lo separa en un array de dos strings
+  // (["152", "251"]), y .map(Number) convierte cada string en un número
+
+  return { start, end };
 }
 
 // Muestra un mensaje de error visible y deja el tablero en un estado "neutro"
