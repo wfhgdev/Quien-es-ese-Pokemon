@@ -1,9 +1,3 @@
-/* ======================================================
-   styles.css — "La pintura y decoración"
-   Aquí no hay lógica de programa, solo reglas de apariencia:
-   colores, tamaños, posiciones y una animación.
-   ====================================================== */
-
 body {
   margin: 0;
   /* Quitamos el margen por defecto que los navegadores le ponen al body,

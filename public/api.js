@@ -1,5 +1,4 @@
 // ======================================================
-// api.js — "El mensajero"
 // Este archivo NO toca el HTML directamente.
 // Su único trabajo es: ir a internet, traer datos de Pokémon,
 // prepararlos, y devolverlos listos para que index.js los use.
@@ -15,7 +14,7 @@ const TOTAL_CHOICES = 4;
 // para que esté disponible globalmente y pueda ser usada desde index.js
 // (recordemos que index.js se carga DESPUÉS de este archivo)
 //
-// MEJORA: esta función ahora RECIBE un parámetro "range", un objeto con
+// Esta función ahora RECIBE un parámetro "range", un objeto con
 // la forma { start, end } (por ejemplo { start: 1, end: 151 } para Kanto).
 // index.js lee ese rango desde el <select id="generation"> del HTML y se
 // lo pasa aquí. Así, api.js no necesita saber nada sobre "generaciones"
@@ -26,9 +25,6 @@ window.getPokeData = async function(range) {
   // es decir, puede "esperar" a que terminen operaciones que toman tiempo
   // (como pedirle datos a internet) sin bloquear el resto del programa
 
-  // MEJORA: antes este bloque tenía su propio try/catch y "tragaba" el error
-  // con un console.error, así que si fallaba el fetch, el usuario se quedaba
-  // viendo la Pokéball girando para siempre sin ninguna explicación.
   // Ahora NO atrapamos el error aquí: lo dejamos "subir" (propagarse) para que
   // sea index.js quien decida cómo mostrárselo al usuario (por ejemplo, un
   // mensaje visual). Así cada archivo cumple un solo rol:
@@ -55,11 +51,9 @@ window.getPokeData = async function(range) {
 
   return {
     // Esta función devuelve un objeto con toda la información que index.js necesita:
-
     pokemonChoices: shuffleArray(pokemonChoices),
     // Volvemos a mezclar las 4 opciones, para que el Pokémon correcto
     // no siempre aparezca en el mismo botón (si no, siempre sería el primero)
-
     correct: {
       image: pokemonImage,   // la imagen que se muestra como silueta
       name: firstPokemon.name, // el nombre correcto, para comparar con lo que el usuario elige

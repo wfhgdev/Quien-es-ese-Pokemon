@@ -1,5 +1,4 @@
 // ======================================================
-// index.js — "El cerebro"
 // Este archivo conecta todo: escucha los clics del usuario,
 // le pide los datos al "mensajero" (api.js), actualiza el HTML,
 // y hace que el navegador diga el nombre del Pokémon en voz alta.
@@ -66,7 +65,7 @@ addAnswerHandler();
 async function fetchData() {
   playBtn.disabled = true;
   generationSelect.disabled = true;
-  // MEJORA: deshabilitamos el botón Y el selector de generación mientras
+  // Deshabilitamos el botón y el selector de generación mientras
   // se está cargando, para que el usuario no pueda hacer clic varias veces
   // ni cambiar de generación a mitad de una petición (lo que podría dejar
   // el juego en un estado raro, mezclando datos de dos generaciones distintas)
@@ -79,38 +78,27 @@ async function fetchData() {
   // Dejamos la imagen en blanco y mostramos la Pokéball girando
 
   try {
-    // MEJORA: antes no había ningún try/catch en index.js, así que si
-    // window.getPokeData() fallaba, el usuario se quedaba viendo la
-    // Pokéball girar para siempre, sin explicación. Ahora sí lo manejamos aquí
-
     const range = getSelectedGenerationRange();
     // Leemos qué generación eligió el usuario en el <select>
-
     gameData = await window.getPokeData(range);
     // Le pedimos los datos al "mensajero" (api.js) y ESPERAMOS (await)
     // a que responda antes de seguir, pasándole el rango de Pokédex
     // que corresponde a la generación elegida. window.getPokeData() es
     // la función que definimos en api.js con "window.getPokeData = async function(range) {...}".
     // Si esta línea lanza un error, saltamos directo al bloque catch de abajo
-
     showSilhouette();
     // Una vez que ya tenemos los datos, mostramos la silueta del Pokémon (en negro)
-
     displayChoices();
     // Y creamos los 4 botones de opciones en pantalla
-
   } catch (error) {
     console.error('Error al cargar los datos del Pokémon: ', error);
     // Seguimos dejando el error en la consola, útil para nosotros como desarrolladores
-
     showError();
     // Y además, ahora sí le avisamos al usuario con un mensaje visible en pantalla
-
   } finally {
     // El bloque "finally" se ejecuta SIEMPRE, haya habido error o no.
     // Lo usamos para asegurarnos de que el botón Play y el selector vuelvan
     // a habilitarse pase lo que pase, y así el usuario siempre pueda intentar de nuevo
-
     playBtn.disabled = false;
     generationSelect.disabled = false;
   }
@@ -123,7 +111,6 @@ function getSelectedGenerationRange() {
   // El "value" de cada <option> en el HTML tiene el formato "inicio-fin"
   // (ej: "152-251"). .split('-') lo separa en un array de dos strings
   // (["152", "251"]), y .map(Number) convierte cada string en un número
-
   return { start, end };
 }
 
@@ -132,7 +119,6 @@ function showError() {
   main.classList.remove('fetching');
   // Quitamos "fetching" para que la Pokéball deje de girar
   // (ya sabemos que la petición falló, no tiene sentido seguir "cargando")
-
   errorMessage.textContent = 'No pudimos cargar el Pokémon. Revisa tu conexión e inténtalo de nuevo.';
   errorMessage.classList.add('visible');
   // Agregamos la clase "visible" definida en el CSS, que cambia el
